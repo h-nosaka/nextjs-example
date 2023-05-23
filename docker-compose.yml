@@ -1,0 +1,77 @@
+version: '3'
+x-logging: &logging
+  driver: json-file
+  options:
+    max-file: '1'
+    max-size: 3m
+x-mariadb: &mariadb
+  mariadb:latest
+x-redis: &redis
+  redis:alpine
+x-es: &es
+  elasticsearch:8.6.1
+services:
+  app:
+    build:
+      context: .
+      target: develop
+    env_file: .env
+    ports:
+      - 8000:3000
+    volumes:
+      - .:/opt/app:delegated
+      - node_data:/opt/app/node_modules
+    logging: *logging
+  # static: # ssgのローカル確認用
+  #   build:
+  #     context: .
+  #     target: production
+  #   ports:
+  #     - 8001:80
+  #   logging: *logging
+  # backend:
+  #   build:
+  #     context: .
+  #     target: production
+  #   env_file: .env
+  #   ports:
+  #     - 8080:80
+  #   depends_on:
+  #     - redis
+  #     - db
+  #   logging: *logging
+  db:
+    image: *mariadb
+    volumes:
+      - db_data:/var/lib/mysql
+    # ports:
+    #   - "3306:3306"
+    environment:
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_PASSWORD: 'qwerty'
+      MYSQL_DATABASE: app
+  redis:
+    image: *redis
+    # ports:
+    #   - "6379:6379"
+    volumes:
+      - redis_data:/data
+    logging: *logging
+  # es:
+  #   image: *es
+  #   ports:
+  #     - 9200:9200
+  #   environment:
+  #     - ES_HEAP_SIZE=512m
+  #     # - ES_JAVA_OPTS="-Xms512m -Xmx512m"
+  #     - discovery.type=single-node
+  #     - xpack.security.enabled=false
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   logging: *logging
+volumes:
+  db_data:
+  redis_data:
+  node_data:
