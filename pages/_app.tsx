@@ -4,7 +4,7 @@ import { AppProps } from 'next/app'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { CacheProvider, EmotionCache } from '@emotion/react'
-import { theme, createEmotionCache, Header, Footer, Alert, Dialog, AlertProps, DialogProps, Toast, ToastProps } from '../atoms'
+import { theme, createEmotionCache, Header, Footer, Alert, Dialog, AlertProps, DialogProps, Toast, ToastProps, AppContext } from '../atoms'
 import Box from '@mui/material/Box'
 import { SnackbarProvider } from 'notistack'
 
@@ -13,12 +13,6 @@ const clientSideEmotionCache = createEmotionCache()
 export interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
 }
-
-export const AppContext = React.createContext({
-  showAlert: (props: AlertProps): void => {},
-  showDialog: (props: DialogProps): void => {},
-  showToast: (props: ToastProps): void => {},
-})
 
 export const App = (props: MyAppProps) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
@@ -31,6 +25,7 @@ export const App = (props: MyAppProps) => {
   const showAlert = (props: AlertProps) => {
     setOpenAlert({ ...props, open: true })
   }
+
   const [openDialog, setOpenDialog] = useState<DialogProps>({
     open: false,
     title: '',
@@ -39,6 +34,7 @@ export const App = (props: MyAppProps) => {
   const showDialog = (props: DialogProps) => {
     setOpenDialog({ ...props, open: true })
   }
+
   const [openToast, setOpenToast] = useState<ToastProps>({
     open: false,
     msg: '',
@@ -46,6 +42,26 @@ export const App = (props: MyAppProps) => {
   })
   const showToast = (props: ToastProps) => {
     setOpenToast({ ...props, open: true })
+  }
+
+  const [isHeader, setIsHeader] = useState<boolean>(true)
+  const setShowHeader = (view: boolean) => {
+    setIsHeader(view)
+  }
+
+  const [isFooter, setIsFooter] = useState<boolean>(true)
+  const setShowFooter = (view: boolean) => {
+    setIsFooter(view)
+  }
+
+  const [anyState, setAnyState] = useState<{ [key: string]: any }>({})
+  const getState = (key: string): any => {
+    return anyState[key]
+  }
+  const setState = (key: string, value: any) => {
+    let src = { ...anyState }
+    src[key] = value
+    setAnyState(src)
   }
 
   return (
@@ -57,9 +73,13 @@ export const App = (props: MyAppProps) => {
         <CssBaseline />
         <AppContext.Provider
           value={{
+            getState: getState,
+            setState: setState,
             showAlert: showAlert,
             showDialog: showDialog,
             showToast: showToast,
+            showHeader: setShowHeader,
+            showFooter: setShowFooter,
           }}
         >
           <SnackbarProvider maxSnack={5}>
@@ -71,9 +91,9 @@ export const App = (props: MyAppProps) => {
                 minHeight: '100vh',
               }}
             >
-              <Header title="Example" />
+              {isHeader ? <Header title="Example" /> : null}
               <Component {...pageProps} />
-              <Footer copyright="Example inc." />
+              {isFooter ? <Footer copyright="Example inc." /> : null}
             </Box>
             <Alert
               {...openAlert}
