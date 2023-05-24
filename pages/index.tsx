@@ -60,7 +60,7 @@ export const Home = () => {
           <Button
             color="success"
             onClick={() => {
-              showDialog({ title: 'test', severity: 'success' })
+              showDialog({ title: 'this is markdown syntax', msg: '# markdown syntax\n- first\n- second', severity: 'success' })
             }}
           >
             open dialog
