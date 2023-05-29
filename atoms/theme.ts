@@ -30,7 +30,10 @@ export const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         outlined: {
-          backgroundColor: '#fff',
+          background: '#fff',
+          '&:hover': {
+            background: 'rgba(255, 255, 255, 0.9)',
+          },
         },
       },
     },

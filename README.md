@@ -3,7 +3,7 @@
 ## usage
 
 ```
-curl https://github.com/h-nosaka/nextjs-example/archive/refs/tags/master.tar.gz | tar -xz
+curl https://codeload.github.com/h-nosaka/nextjs-example/tar.gz/refs/tags/master | tar -xz
 cd nextjs-example-master
 git init
 git remote add origin {任意のgithubのリポジトリ}
